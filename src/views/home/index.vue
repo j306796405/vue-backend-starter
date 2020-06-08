@@ -8,7 +8,7 @@
 
   export default {
     name: 'home',
-    data() {
+    data () {
       return {
           welcome: 'hello'
       }
