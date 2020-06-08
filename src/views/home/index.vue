@@ -6,17 +6,17 @@
 
 <script>
 
-  export default {
-    name: 'home',
-    data () {
-      return {
-          welcome: 'hello'
-      }
-    },
-    mounted (){
-
+export default {
+  name: 'home',
+  data () {
+    return {
+      welcome: 'hello'
     }
+  },
+  mounted () {
+
   }
+}
 </script>
 
 <style scoped>
