@@ -13,8 +13,8 @@
           welcome: 'hello'
       }
     },
-    mounted(){
-      console.log(abc)
+    mounted (){
+
     }
   }
 </script>

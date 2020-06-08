@@ -26,10 +26,12 @@
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.9.0",
+    "@vue/cli-plugin-eslint": "^4.4.1",
     "@vue/cli-service": "^3.9.0",
     "babel-eslint": "^10.1.0",
     "eslint": "^7.2.0",
     "eslint-config-standard": "^14.1.1",
+    "eslint-loader": "^4.0.2",
     "eslint-plugin-import": "^2.21.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
@@ -45,11 +47,7 @@
     "pre-commit": "lint-staged"
   },
   "lint-staged": {
-    "*.js": [
-      "vue-cli-service lint",
-      "git add"
-    ],
-    "*.vue": [
+    "*.{js,jsx,vue}": [
       "vue-cli-service lint",
       "git add"
     ]
