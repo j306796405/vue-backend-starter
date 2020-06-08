@@ -1,5 +1,5 @@
 {
-  "name": "vue-manage-system",
+  "name": "vue-backend-starter",
   "version": "4.2.0",
   "private": true,
   "scripts": {
@@ -44,5 +44,11 @@
     "hooks": {
       "commit-msg": "commitlint -e $HUSKY_GIT_PARAMS"
     }
+  },
+  "lint-staged": {
+    "*.{js,jsx,vue}": [
+      "vue-cli-service lint",
+      "git add"
+    ]
   }
 }
