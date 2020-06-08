@@ -1,6 +1,6 @@
 <template>
   <div class="home-page">
-
+    {{ welcome }}
   </div>
 </template>
 
@@ -10,7 +10,11 @@
     name: 'home',
     data() {
       return {
+          welcome: 'hello'
       }
+    },
+    mounted(){
+      console.log(abc)
     }
   }
 </script>
