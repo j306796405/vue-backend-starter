@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-export function fetchList(parentId, params) {
+export function fetchList (parentId, params) {
   return request({
     url: '/menu/list/' + parentId,
     method: 'get',
@@ -8,14 +8,14 @@ export function fetchList(parentId, params) {
   })
 }
 
-export function deleteMenu(id) {
+export function deleteMenu (id) {
   return request({
     url: '/menu/delete/' + id,
     method: 'post'
   })
 }
 
-export function createMenu(data) {
+export function createMenu (data) {
   return request({
     url: '/menu/create',
     method: 'post',
@@ -23,7 +23,7 @@ export function createMenu(data) {
   })
 }
 
-export function updateMenu(id, data) {
+export function updateMenu (id, data) {
   return request({
     url: '/menu/update/' + id,
     method: 'post',
@@ -31,14 +31,14 @@ export function updateMenu(id, data) {
   })
 }
 
-export function getMenu(id) {
+export function getMenu (id) {
   return request({
     url: '/menu/' + id,
-    method: 'get',
+    method: 'get'
   })
 }
 
-export function updateHidden(id, params) {
+export function updateHidden (id, params) {
   return request({
     url: '/menu/updateHidden/' + id,
     method: 'post',
@@ -46,10 +46,9 @@ export function updateHidden(id, params) {
   })
 }
 
-export function fetchTreeList() {
+export function fetchTreeList () {
   return request({
     url: '/menu/treeList',
     method: 'get'
   })
 }
-

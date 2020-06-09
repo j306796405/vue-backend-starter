@@ -46,7 +46,7 @@
         </el-form-item>
       </el-form>
     </el-card>
-    <img :src="login_center_bg" class="login-center-layout">
+    <img :src="loginCenterBg" class="login-center-layout">
     <el-dialog
       title="公众号二维码"
       :visible.sync="dialogVisible"
@@ -68,83 +68,83 @@
 </template>
 
 <script>
-  import { isvalidUsername } from '@/utils/validate';
-  import { setSupport, getSupport, setCookie, getCookie } from '@/utils/support';
-  import login_center_bg from '@/assets/images/login_center_bg.png';
+import { isvalidUsername } from '@/utils/validate'
+import { setSupport, getCookie } from '@/utils/support'
+import loginCenterBg from '@/assets/images/login_center_bg.png'
 
-  export default {
-    name: 'login',
-    data() {
-      const validateUsername = (rule, value, callback) => {
-        if (!isvalidUsername(value)) {
-          callback(new Error('请输入正确的用户名'));
-        } else {
-          callback();
-        }
-      };
-      const validatePass = (rule, value, callback) => {
-        if (value.length < 3) {
-          callback(new Error('密码不能小于3位'));
-        } else {
-          callback();
-        }
-      };
-      return {
-        loginForm: {
-          username: '',
-          password: ''
-        },
-        loginRules: {
-          username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-          password: [{ required: true, trigger: 'blur', validator: validatePass }]
-        },
-        loading: false,
-        pwdType: 'password',
-        login_center_bg,
-        dialogVisible: false,
-        supportDialogVisible: false
-      };
-    },
-    created() {
-      this.loginForm.username = getCookie('username');
-      this.loginForm.password = getCookie('password');
-      if (this.loginForm.username === undefined || this.loginForm.username == null || this.loginForm.username === '') {
-        this.loginForm.username = 'admin';
-      }
-      if (this.loginForm.password === undefined || this.loginForm.password == null) {
-        this.loginForm.password = '';
-      }
-    },
-    methods: {
-      showPwd() {
-        if (this.pwdType === 'password') {
-          this.pwdType = '';
-        } else {
-          this.pwdType = 'password';
-        }
-      },
-      handleLogin() {
-        this.$refs.loginForm.validate(valid => {
-          if (valid) {
-            this.$router.push({ path: '/' });
-          } else {
-            return false;
-          }
-        });
-      },
-      handleTry() {
-        this.dialogVisible = true;
-      },
-      dialogConfirm() {
-        this.dialogVisible = false;
-        setSupport(true);
-      },
-      dialogCancel() {
-        this.dialogVisible = false;
-        setSupport(false);
+export default {
+  name: 'login',
+  data () {
+    const validateUsername = (rule, value, callback) => {
+      if (!isvalidUsername(value)) {
+        callback(new Error('请输入正确的用户名'))
+      } else {
+        callback()
       }
     }
-  };
+    const validatePass = (rule, value, callback) => {
+      if (value.length < 3) {
+        callback(new Error('密码不能小于3位'))
+      } else {
+        callback()
+      }
+    }
+    return {
+      loginForm: {
+        username: '',
+        password: ''
+      },
+      loginRules: {
+        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        password: [{ required: true, trigger: 'blur', validator: validatePass }]
+      },
+      loading: false,
+      pwdType: 'password',
+      loginCenterBg,
+      dialogVisible: false,
+      supportDialogVisible: false
+    }
+  },
+  created () {
+    this.loginForm.username = getCookie('username')
+    this.loginForm.password = getCookie('password')
+    if (this.loginForm.username === undefined || this.loginForm.username == null || this.loginForm.username === '') {
+      this.loginForm.username = 'admin'
+    }
+    if (this.loginForm.password === undefined || this.loginForm.password == null) {
+      this.loginForm.password = ''
+    }
+  },
+  methods: {
+    showPwd () {
+      if (this.pwdType === 'password') {
+        this.pwdType = ''
+      } else {
+        this.pwdType = 'password'
+      }
+    },
+    handleLogin () {
+      this.$refs.loginForm.validate(valid => {
+        if (valid) {
+          this.$router.push({ path: '/' })
+        } else {
+          return false
+        }
+      })
+    },
+    handleTry () {
+      this.dialogVisible = true
+    },
+    dialogConfirm () {
+      this.dialogVisible = false
+      setSupport(true)
+    },
+    dialogCancel () {
+      this.dialogVisible = false
+      setSupport(false)
+    }
+  }
+}
 </script>
 
 <style scoped>

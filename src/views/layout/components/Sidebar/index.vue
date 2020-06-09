@@ -17,20 +17,19 @@
 <script>
 import { mapGetters } from 'vuex'
 import SidebarItem from './SidebarItem'
-import ScrollBar from '@/components/ScrollBar'
 
 export default {
-  components: { SidebarItem, ScrollBar },
+  components: { SidebarItem },
   computed: {
     ...mapGetters([
       'sidebar',
       'routers'
     ]),
-    routes() {
+    routes () {
       // return this.$router.options.routes
       return this.routers
     },
-    isCollapse() {
+    isCollapse () {
       return !this.sidebar.opened
     }
   }
