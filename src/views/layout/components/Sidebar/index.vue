@@ -17,9 +17,10 @@
 <script>
 import { mapGetters } from 'vuex'
 import SidebarItem from './SidebarItem'
+import ScrollBar from '@/components/ScrollBar'
 
 export default {
-  components: { SidebarItem },
+  components: { SidebarItem, ScrollBar },
   computed: {
     ...mapGetters([
       'sidebar',

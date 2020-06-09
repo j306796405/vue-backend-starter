@@ -1,6 +1,6 @@
 <template>
   <div class="home-page">
-    {{ welcome }}
+
   </div>
 </template>
 
@@ -12,9 +12,6 @@ export default {
     return {
       welcome: 'hello'
     }
-  },
-  mounted () {
-    console.log(this.welcome)
   }
 }
 </script>
