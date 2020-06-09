@@ -7,12 +7,12 @@
 <script>
 
 export default {
-  name: 'home',
-  data () {
-    return {
-      welcome: 'hello'
-    }
-  }
+	name: 'home',
+	data () {
+		return {
+			welcome: 'hello'
+		}
+	}
 }
 </script>
 

@@ -21,9 +21,11 @@ Vue.use(VCharts)
 
 Vue.config.productionTip = false
 
-new Vue({
-  el: '#app',
-  router,
-  store,
-  render: h => h(App)
+const vm = new Vue({
+	el: '#app',
+	router,
+	store,
+	render: h => h(App)
 })
+
+Vue.use({ vm })

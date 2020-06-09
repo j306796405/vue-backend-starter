@@ -8,12 +8,12 @@ import getters from './getters'
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
-  modules: {
-    app,
-    user,
-    permission
-  },
-  getters
+	modules: {
+		app,
+		user,
+		permission
+	},
+	getters
 })
 
 export default store
