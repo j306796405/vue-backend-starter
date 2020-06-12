@@ -1,108 +1,89 @@
-import { asyncRouterMap, constantRouterMap } from '@/router/index'
+import { localAsyncRoutes } from '@/router'
+import { getMenu } from '@/api/user'
 
-// 判断是否有权限访问该菜单
-function hasPermission (menus, route) {
-	if (route.name) {
-		const currMenu = getMenu(route.name, menus)
-		if (currMenu != null) {
-			// 设置菜单的标题、图标和可见性
-			if (currMenu.title != null && currMenu.title !== '') {
-				route.meta.title = currMenu.title
-			}
-			if (currMenu.icon != null && currMenu.title !== '') {
-				route.meta.icon = currMenu.icon
-			}
-			if (currMenu.hidden != null) {
-				route.hidden = currMenu.hidden !== 0
-			}
-			if (currMenu.sort != null && currMenu.sort !== '') {
-				route.sort = currMenu.sort
-			}
-			return true
-		} else {
-			route.sort = 0
-			if (route.hidden !== undefined && route.hidden === true) {
-				return true
-			} else {
-				return false
-			}
-		}
-	} else {
-		return true
-	}
+const state = {
+  accessRoutesMap: null,
+  accessRoute: null,
+  menu: null
 }
 
-// 根据路由名称获取菜单
-function getMenu (name, menus) {
-	for (let i = 0; i < menus.length; i++) {
-		const menu = menus[i]
-		if (name === menu.name) {
-			return menu
-		}
-	}
-	return null
+const mutations = {
+  SET_ROUTE: (state, { accessRoutesMap, accessRoute }) => {
+    state.accessRoutesMap = accessRoutesMap
+    state.accessRoute = accessRoute
+  },
+  SET_MENU: (state, menu) => {
+    state.menu = menu
+  }
 }
 
-// 对菜单进行排序
-function sortRouters (accessedRouters) {
-	for (let i = 0; i < accessedRouters.length; i++) {
-		const router = accessedRouters[i]
-		if (router.children && router.children.length > 0) {
-			router.children.sort(compare('sort'))
-		}
-	}
-	accessedRouters.sort(compare('sort'))
+const actions = {
+  // 生成本地路由及接口路由字典
+  GenerateRoutes ({ commit }) {
+    return getMenu().then((menu = {}) => {
+      commit('SET_MENU', menu)
+      const accessRoutesMap = getAccessRouteMap(menu)
+      const accessRoute = getAccessRoute(accessRoutesMap)
+      commit('SET_ROUTE', { accessRoutesMap, accessRoute })
+      return menu
+    })
+  }
 }
 
-// 降序比较函数
-function compare (p) {
-	return function (m, n) {
-		const a = m[p]
-		const b = n[p]
-		return b - a
-	}
+function getAccessRouteMap (menu = [], accessRouteMap = {}) {
+  if (Array.isArray(menu)) {
+    menu.forEach((route) => {
+      const { items = [], code } = route
+      if (Array.isArray(items) && items.length > 0) {
+        getAccessRouteMap(items, accessRouteMap)
+      }
+      if (code) {
+        accessRouteMap[code] = route
+      }
+    })
+  }
+  return accessRouteMap
 }
 
-const permission = {
-	state: {
-		routers: constantRouterMap,
-		addRouters: []
-	},
-	mutations: {
-		SET_ROUTERS: (state, routers) => {
-			state.addRouters = routers
-			state.routers = constantRouterMap.concat(routers)
-		}
-	},
-	actions: {
-		GenerateRoutes ({ commit }, data) {
-			return new Promise(resolve => {
-				const { menus } = data
-				const accessedRouters = asyncRouterMap.filter(v => {
-					// admin帐号直接返回所有菜单
-					// if(username==='admin') return true;
-					if (hasPermission(menus, v)) {
-						if (v.children && v.children.length > 0) {
-							v.children = v.children.filter(child => {
-								if (hasPermission(menus, child)) {
-									return child
-								}
-								return false
-							})
-							return v
-						} else {
-							return v
-						}
-					}
-					return false
-				})
-				// 对菜单进行排序
-				sortRouters(accessedRouters)
-				commit('SET_ROUTERS', accessedRouters)
-				resolve()
-			})
-		}
-	}
+function getAccessRoute (accessRouteMap, asyncRoutes = localAsyncRoutes) {
+  return asyncRoutes.filter((route) => {
+    const permission = getPermission(accessRouteMap, route)
+    if (permission.hasAuth) {
+      if (route.children && route.children.length > 0 && !permission.isEnd) {
+        route.children = getAccessRoute(accessRouteMap, route.children)
+      }
+      return true
+    }
+    return false
+  })
 }
 
-export default permission
+function getPermission (accessRouteMap, route) {
+  const code = route.code
+  const permission = {
+    hasAuth: false,
+    isEnd: true
+  }
+  if (code) {
+    if (accessRouteMap[code]) {
+      permission.hasAuth = true
+      const children = accessRouteMap[code].items
+      if (Array.isArray(children) && children.length > 0) {
+        permission.isEnd = false
+      }
+    }
+  } else {
+    permission.hasAuth = true
+    if (Array.isArray(route.children) && route.children.length > 0) {
+      permission.isEnd = false
+    }
+  }
+
+  return permission
+}
+
+export default {
+  state,
+  mutations,
+  actions
+}

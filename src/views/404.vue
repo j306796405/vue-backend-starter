@@ -20,17 +20,17 @@
 import img404 from '@/assets/images/gif_404.gif'
 
 export default {
-	name: 'wrongPage',
-	data () {
-		return {
-			img404
-		}
-	},
-	methods: {
-		handleGoMain () {
-			this.$router.push({ path: '/' })
-		}
-	}
+  name: 'wrongPage',
+  data () {
+    return {
+      img404
+    }
+  },
+  methods: {
+    handleGoMain () {
+      this.$router.push({ path: '/' })
+    }
+  }
 }
 </script>
 

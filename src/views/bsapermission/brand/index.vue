@@ -1,14 +1,13 @@
 <template>
-  <div id="app">
-    <router-view/>
-  </div>
+    <div>品牌基础信息</div>
 </template>
 
 <script>
 export default {
-  name: 'App'
+  name: 'brand'
 }
 </script>
 
-<style>
+<style scoped>
+
 </style>

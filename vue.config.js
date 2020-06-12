@@ -3,31 +3,59 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 const BUILD_ENV = process.env.VUE_APP_BUILD_ENV || process.env.NODE_ENV
 
 module.exports = {
-	baseUrl: './',
-	assetsDir: 'static',
-	productionSourceMap: false,
-	lintOnSave: process.env.NODE_ENV !== 'production',
-	devServer: {
-		overlay: {
-			warnings: false,
-			errors: true
-		}
-	},
-	configureWebpack: config => {
-		const plugins = []
+  publicPath: './',
+  assetsDir: 'static',
+  productionSourceMap: false,
+  lintOnSave: process.env.NODE_ENV !== 'production',
+  devServer: {
+    overlay: {
+      warnings: false,
+      errors: true
+    },
+    proxy: {
+      '/permissionProxy': {
+        // 目标 API 地址
+        target: 'http://ump-permission.fi.com/',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/permissionProxy': ''
+        },
+        onProxyRes: function (proxyRes, req, res) {
+          const cookies = proxyRes.headers['set-cookie']
+          const cookieRegex = /Path=\/permission.web\//i
+          // 修改cookie Path
+          if (cookies) {
+            var newCookie = cookies.map(function (cookie) {
+              if (cookieRegex.test(cookie)) {
+                return cookie.replace(cookieRegex, 'Path=/')
+              }
+              return cookie
+            })
+            // 修改cookie path
+            delete proxyRes.headers['set-cookie']
+            proxyRes.headers['set-cookie'] = newCookie
+          }
+        }
+      }
+    }
+  },
+  configureWebpack: config => {
+    const plugins = []
 
-		config.plugins = [...config.plugins, ...plugins]
-	},
-	chainWebpack (config) {
-		// 避免队头阻塞
-		config.plugins.delete('preload') // TODO: need test
-		config.plugins.delete('prefetch') // TODO: need test
+    config.plugins = [...config.plugins, ...plugins]
+  },
+  chainWebpack (config) {
+    // 避免队头阻塞
+    config.plugins.delete('preload') // TODO: need test
+    config.plugins.delete('prefetch') // TODO: need test
 
-		config.resolve.alias
-			.set('@', resolve('src'))
+    config.resolve.alias
+      .set('@', resolve('src'))
+      .set('@const', resolve('src/public/const'))
+      .set('@utils', resolve('src/utils'))
 
-		// CDN化
-		/* var externals = {
+    // CDN化
+    /* var externals = {
       vue: 'Vue',
       axios: 'axios',
       'element-ui': 'ELEMENT',
@@ -72,96 +100,96 @@ module.exports = {
         return args
       }) */
 
-		// set svg-sprite-loader
-		config.module
-			.rule('svg')
-			.exclude.add(resolve('src/icons'))
-			.end()
+    // set svg-sprite-loader
+    config.module
+      .rule('svg')
+      .exclude.add(resolve('src/icons'))
+      .end()
 
-		config.module
-			.rule('icons')
-			.test(/\.svg$/)
-			.include.add(resolve('src/icons'))
-			.end()
-			.use('svg-sprite-loader')
-			.loader('svg-sprite-loader')
-			.options({
-				symbolId: 'icon-[name]'
-			})
-			.end()
+    config.module
+      .rule('icons')
+      .test(/\.svg$/)
+      .include.add(resolve('src/icons'))
+      .end()
+      .use('svg-sprite-loader')
+      .loader('svg-sprite-loader')
+      .options({
+        symbolId: 'icon-[name]'
+      })
+      .end()
 
-		if (process.env.NODE_ENV === 'production') {
-			// 打包文件性能分析
-			if (process.env.ANALYZE_ENV) {
-				config
-					.plugin('webpack-bundle-analyzer')
-					.use(BundleAnalyzerPlugin)
-			}
+    if (process.env.NODE_ENV === 'production') {
+      // 打包文件性能分析
+      if (process.env.ANALYZE_ENV) {
+        config
+          .plugin('webpack-bundle-analyzer')
+          .use(BundleAnalyzerPlugin)
+      }
 
-			// 小于5k的图片会转base64
-			config.module
-				.rule('images')
-				.use('url-loader')
-				.loader('url-loader')
-				.tap(options => Object.assign(options, { limit: 5000, esModule: false }))
+      // 小于5k的图片会转base64
+      config.module
+        .rule('images')
+        .use('url-loader')
+        .loader('url-loader')
+        .tap(options => Object.assign(options, { limit: 5000, esModule: false }))
 
-			// 移除console，parallel多线程构建
-			config.optimization.minimizer('terser').tap((args) => {
-				args[0].terserOptions.compress.drop_console = true
-				args[0].terserOptions.parallel = true
-				return args
-			})
-		}
+      // 移除console，parallel多线程构建
+      // config.optimization.minimizer('terser').tap((args) => {
+      // 	args[0].terserOptions.compress.drop_console = true
+      // 	args[0].terserOptions.parallel = true
+      // 	return args
+      // })
+    }
 
-		if (BUILD_ENV === 'development') {
-			config.devtool('cheap-source-map')
-			config.optimization.splitChunks({
-				cacheGroups: {
-					vendor: {
-						test: /node_modules/,
-						chunks: 'initial',
-						name: 'vendor',
-						priority: 10,
-						enforce: true
-					},
-					style: {
-						test: /styles/,
-						chunks: 'initial',
-						name: 'style',
-						priority: 9,
-						enforce: true
-					}
-				}
-			})
-		} else {
-			config.optimization.splitChunks({
-				chunks: 'all',
-				cacheGroups: {
-					libs: {
-						name: 'vendor',
-						test: /[\\/]node_modules[\\/]/,
-						priority: 10,
-						chunks: 'initial' // only package third parties that are initially dependent
-					},
-					elementUI: {
-						name: 'chunk-elementUI', // split elementUI into a single package
-						priority: 20, // the weight needs to be larger than libs and app or it will be packaged into libs or app
-						test: /[\\/]node_modules[\\/]_?element-ui(.*)/ // in order to adapt to cnpm
-					},
-					commons: {
-						name: 'chunk-commons',
-						test: resolve('src/common'), // can customize your rules
-						minChunks: 3, //  minimum common number
-						priority: 5,
-						reuseExistingChunk: true
-					}
-				}
-			})
-			config.optimization.runtimeChunk('single')
-		}
-	}
+    if (BUILD_ENV === 'development') {
+      config.devtool('cheap-source-map')
+      config.optimization.splitChunks({
+        cacheGroups: {
+          vendor: {
+            test: /node_modules/,
+            chunks: 'initial',
+            name: 'vendor',
+            priority: 10,
+            enforce: true
+          },
+          style: {
+            test: /styles/,
+            chunks: 'initial',
+            name: 'style',
+            priority: 9,
+            enforce: true
+          }
+        }
+      })
+    } else {
+      config.optimization.splitChunks({
+        chunks: 'all',
+        cacheGroups: {
+          libs: {
+            name: 'vendor',
+            test: /[\\/]node_modules[\\/]/,
+            priority: 10,
+            chunks: 'initial' // only package third parties that are initially dependent
+          },
+          elementUI: {
+            name: 'chunk-elementUI', // split elementUI into a single package
+            priority: 20, // the weight needs to be larger than libs and app or it will be packaged into libs or app
+            test: /[\\/]node_modules[\\/]_?element-ui(.*)/ // in order to adapt to cnpm
+          },
+          commons: {
+            name: 'chunk-commons',
+            test: resolve('src/common'), // can customize your rules
+            minChunks: 3, //  minimum common number
+            priority: 5,
+            reuseExistingChunk: true
+          }
+        }
+      })
+      config.optimization.runtimeChunk('single')
+    }
+  }
 }
 
 function resolve (dir) {
-	return path.join(__dirname, dir)
+  return path.join(__dirname, dir)
 }
