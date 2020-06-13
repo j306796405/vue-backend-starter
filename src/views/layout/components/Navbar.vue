@@ -4,9 +4,9 @@
     <breadcrumb></breadcrumb>
     <el-dropdown class="avatar-container" trigger="click">
       <div class="avatar-wrapper">
-        <div class="welcome">
+        <div class="welcome" v-if="userInfo">
           <span class="name">Hi, </span>
-          <span class="name avatar-name">jiang</span>
+          <span class="name avatar-name">{{userInfo.name}}</span>
         </div>
         <img class="user-avatar" src="https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif">
         <i class="el-icon-caret-bottom"></i>
@@ -47,7 +47,8 @@ export default {
     },
     logout () {
       this.$store.dispatch('LogOut').then(() => {
-        location.reload() // 为了重新实例化vue-router对象 避免bug
+        // 为了重新实例化vue-router对象 避免bug
+        location.reload()
       })
     }
   }
@@ -87,7 +88,7 @@ export default {
         .welcome {
           display: inline-block;
           vertical-align: middle;
-          padding: 0 5px;
+          padding: 0 10px;
           font-size: 12px;
 
           .avatar-name {

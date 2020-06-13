@@ -19,6 +19,7 @@ if (process.env.NODE_ENV === 'development') {
   Vue.config.devtools = true
 }
 
+Vue.prototype.$log = window.console.log
 Vue.use(ElementUI, { locale })
 Vue.use(VCharts)
 

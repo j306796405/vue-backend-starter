@@ -13,7 +13,8 @@ router.beforeEach(async (to, from, next) => {
       next({ path: '/home' })
       NProgress.done()
     } else {
-      const { businessList, menu, info } = store.state.user
+      const { businessList, info } = store.state.user
+      const { menu } = store.state.permission
 
       if (!info) {
         store.dispatch('GetUserInfo')

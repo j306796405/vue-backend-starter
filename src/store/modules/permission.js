@@ -1,5 +1,6 @@
 import { localAsyncRoutes } from '@/router'
 import { getMenu } from '@/api/user'
+import store from '@/store'
 
 const state = {
   accessRoutesMap: null,
@@ -20,7 +21,8 @@ const mutations = {
 const actions = {
   // 生成本地路由及接口路由字典
   GenerateRoutes ({ commit }) {
-    return getMenu().then((menu = {}) => {
+    const { code } = store.state.user.currentBusiness
+    return getMenu(code).then((menu = {}) => {
       commit('SET_MENU', menu)
       const accessRoutesMap = getAccessRouteMap(menu)
       const accessRoute = getAccessRoute(accessRoutesMap)

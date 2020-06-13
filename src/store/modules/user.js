@@ -11,11 +11,15 @@ const user = {
       state.info = info
       setToken(info.id)
     },
-    SET_BUSINESS_LIST: (state, businessList) => {
+    SET_BUSINESS: (state, businessList) => {
       state.businessList = businessList
+      if (Array.isArray(businessList) && businessList.length > 0) {
+        state.currentBusiness = businessList[0]
+      }
     },
     RESET_USER (state) {
       state = getInitialState()
+      removeAll()
       router.push(`/login?redirect=${router.currentRoute.fullPath}`)
     }
   },
@@ -37,7 +41,7 @@ const user = {
     GetBusinessList ({ commit, state }) {
       return new Promise((resolve, reject) => {
         getBusinessList().then(businessList => {
-          commit('SET_BUSINESS_LIST', businessList)
+          commit('SET_BUSINESS', businessList)
           resolve(businessList)
         })
       })
@@ -80,8 +84,8 @@ const user = {
 function getInitialState () {
   return {
     info: null,
-    menu: null,
-    businessList: null
+    businessList: null,
+    currentBusiness: null
   }
 }
 
