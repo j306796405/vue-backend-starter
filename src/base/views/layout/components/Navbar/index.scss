@@ -1,0 +1,66 @@
+.navbar {
+  height: 50px;
+  line-height: 50px;
+  border-radius: 0px !important;
+
+  .hamburger-container {
+    line-height: 58px;
+    height: 50px;
+    float: left;
+    padding: 0 10px;
+  }
+
+  .screenfull {
+    position: absolute;
+    right: 90px;
+    top: 16px;
+    color: red;
+  }
+
+  .navbar-toolbar {
+    position: absolute;
+    top: 0;
+    right: 35px;
+    display: flex;
+    height: 50px;
+
+    &-item {
+      display: flex;
+      align-items: center;
+      height: 50px;
+      margin-left: 8px;
+      cursor: pointer;
+    }
+
+    .welcome {
+      padding: 0 10px;
+      font-size: 12px;
+
+      .avatar-name {
+        font-size: 13px;
+        color: #a9d86e;
+      }
+    }
+
+    .avatar {
+      .avatar-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 5px;
+      }
+    }
+
+    .el-icon-caret-bottom {
+      position: absolute;
+      right: -20px;
+      top: 25px;
+      font-size: 12px;
+    }
+  }
+
+  .system {
+    .el-icon-menu {
+      font-size: 28px;
+    }
+  }
+}
