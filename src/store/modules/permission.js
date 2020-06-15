@@ -61,16 +61,28 @@ function getAccessRoute (accessRouteMap, asyncRoutes = localAsyncRoutes) {
 }
 
 function getPermission (accessRouteMap, route) {
-  const code = route.code
+  const code = route.name
   const permission = {
     hasAuth: false,
     isEnd: true
   }
   if (code) {
     if (accessRouteMap[code]) {
+      const accessRoute = accessRouteMap[code]
       permission.hasAuth = true
+      if (accessRoute.icon && route.meta) {
+        route.meta.icon = accessRouteMap[code].icon
+      }
+      if (accessRoute.label && route.meta) {
+        route.meta.title = accessRouteMap[code].label
+      }
+      if (accessRoute.label && route.meta) {
+        route.meta.title = accessRouteMap[code].label
+      }
+
       const children = accessRouteMap[code].items
       if (Array.isArray(children) && children.length > 0) {
+        (children[0].url) && (route.redirect = children[0].url)
         permission.isEnd = false
       }
     }
