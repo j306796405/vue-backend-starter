@@ -1,12 +1,27 @@
 const path = require('path')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
-const BUILD_ENV = process.env.VUE_APP_BUILD_ENV || process.env.NODE_ENV
+
+const pages = {
+  index: {
+    entry: 'src/base/main.js',
+    template: 'public/index.html',
+    chunks: [
+      'index', // 注意：这个是页面名称的chunk,下面的chunk名称需要对呀splitChunk对应的名称
+      'chunk-vendors', // 这是node_modules下的chunk
+      'chunk-common', // 这是admin和Index入口公用的chunk
+      'chunk-element-ui', // index的单独chunk
+      'chunk-echarts', // index的单独chunk
+      'chunk-zrender' // index的单独chunk
+    ]
+  }
+}
 
 module.exports = {
   publicPath: './',
   assetsDir: 'static',
   productionSourceMap: false,
   lintOnSave: process.env.NODE_ENV !== 'production',
+  pages,
   devServer: {
     overlay: {
       warnings: false,
@@ -43,11 +58,72 @@ module.exports = {
     const plugins = []
 
     config.plugins = [...config.plugins, ...plugins]
+
+    config.optimization = {
+      splitChunks: {
+        cacheGroups: {
+          // 抽离所有入口的公用资源为一个chunk
+          common: {
+            name: 'chunk-common',
+            chunks: 'all',
+            minChunks: 2,
+            maxInitialRequests: 5,
+            minSize: 0,
+            priority: 1,
+            reuseExistingChunk: true,
+            enforce: true
+          },
+          // 抽离node_modules下的库为一个chunk
+          vendors: {
+            name: 'chunk-vendors',
+            test: /[\\/]node_modules[\\/]/,
+            chunks: 'all',
+            priority: 2,
+            reuseExistingChunk: true,
+            enforce: true
+          },
+          // 提取element-ui为一个chunk，避免vendor过大
+          element: {
+            name: 'chunk-element-ui',
+            test: /[\\/]node_modules[\\/]element-ui[\\/]/,
+            chunks: 'all',
+            priority: 3,
+            reuseExistingChunk: true,
+            enforce: true
+          },
+          // 因为echarts不常使用，提取echarts为一个chunk，以减小vendor体积
+          echarts: {
+            name: 'chunk-echarts',
+            test: /[\\/]node_modules[\\/](vue-)?echarts[\\/]/,
+            chunks: 'all',
+            priority: 4,
+            reuseExistingChunk: true,
+            enforce: true
+          },
+          // 由于echarts使用了zrender库，那么需要将其抽离出来，避免不常使用的库增加vendor体积
+          zrender: {
+            name: 'chunk-zrender',
+            test: /[\\/]node_modules[\\/]zrender[\\/]/,
+            chunks: 'all',
+            priority: 3,
+            reuseExistingChunk: true,
+            enforce: true
+          }
+        }
+      }
+    }
   },
   chainWebpack (config) {
-    // 避免队头阻塞
-    config.plugins.delete('preload') // TODO: need test
-    config.plugins.delete('prefetch') // TODO: need test
+    // 针对多页面配置，移除preload、prefetch
+    Object.keys(pages).forEach(function (key) {
+      config.plugins.delete('preload-' + key)
+      config.plugins.delete('prefetch-' + key)
+    })
+
+    if (process.env.NODE_ENV === 'production') {
+      // 删除系统默认的splitChunk
+      config.optimization.delete('splitChunks')
+    }
 
     config.resolve.alias
       .set('@', resolve('src'))
@@ -140,46 +216,6 @@ module.exports = {
       // 	args[0].terserOptions.parallel = true
       // 	return args
       // })
-    }
-
-    if (BUILD_ENV === 'development') {
-      config.devtool('cheap-source-map')
-      config.optimization.splitChunks({
-        cacheGroups: {
-          vendor: {
-            test: /node_modules/,
-            chunks: 'initial',
-            name: 'vendor',
-            priority: 10,
-            enforce: true
-          },
-          style: {
-            test: /styles/,
-            chunks: 'initial',
-            name: 'style',
-            priority: 9,
-            enforce: true
-          }
-        }
-      })
-    } else {
-      config.optimization.splitChunks({
-        chunks: 'all',
-        cacheGroups: {
-          libs: {
-            name: 'vendor',
-            test: /[\\/]node_modules[\\/]/,
-            priority: 10,
-            chunks: 'initial' // only package third parties that are initially dependent
-          },
-          elementUI: {
-            name: 'chunk-elementUI', // split elementUI into a single package
-            priority: 20, // the weight needs to be larger than libs and app or it will be packaged into libs or app
-            test: /[\\/]node_modules[\\/]_?element-ui(.*)/ // in order to adapt to cnpm
-          }
-        }
-      })
-      config.optimization.runtimeChunk('single')
     }
   }
 }
