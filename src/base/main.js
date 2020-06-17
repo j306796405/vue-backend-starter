@@ -11,6 +11,7 @@ import store from '@base/store'
 
 import '@base/icons' // icon
 import '@base/permission' // permission control
+import '@logic/main' // 扩展业务自定义方法等
 
 if (process.env.NODE_ENV === 'development') {
   Vue.config.devtools = true

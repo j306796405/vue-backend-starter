@@ -1,2 +1,24 @@
 1: Mock Server
 2: icons
+3: 如非必要请不要在main.js中使用Vue.use(VCharts)这类全局注入的写法，会导致vendor体积过大影响用户体验。
+4: 业务请在logic目录开发，base目录是工程目录严禁修改，开发过程中如遇问题请联系蒋林捷
+5: logic目录下几个有几个必须的文件
+5.1 router/index.js 业务路由
+5.2 views/home 项目首页
+5.3 main.js 工程目录会引用该文件，可作为扩展自定义的全局方法等等
+6: git提交规范必须按如下格式
+git commit -m 'feat: 我开发了一个新功能'
+git commit -m 'fix: 我修复了一个bug'
+[
+  'docs', // 仅仅修改了文档，比如README, CHANGELOG, CONTRIBUTE等等
+  'chore', // 改变构建流程、或者增加依赖库、工具等
+  'feat', // 新增feature
+  'fix', // 修复bug
+  'merge', // 合并分支
+  'perf', // 优化相关，比如提升性能、体验
+  'refactor', // 代码重构，没有加新功能或者修复bug
+  'revert', // 回滚到上一个版本
+  'style', // 仅仅修改了空格、格式缩进、都好等等，不改变代码逻辑
+  'test', // 测试用例，包括单元测试、集成测试等
+  'chore' // 不属于以上类型的其他类型
+]
