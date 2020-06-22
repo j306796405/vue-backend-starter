@@ -22,3 +22,6 @@ git commit -m 'fix: 我修复了一个bug'
   'test', // 测试用例，包括单元测试、集成测试等
   'chore' // 不属于以上类型的其他类型
 ]
+7: 代码格式化
+vs code https://juejin.im/post/5cda310cf265da035b61b99b
+webstorm 

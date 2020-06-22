@@ -1,7 +1,5 @@
 <template>
-  <div class="home-page">
-    {{ welcome | toThousand }}
-  </div>
+  <div class="home-page">{{ welcome | toThousand }}</div>
 </template>
 
 <script>
@@ -21,5 +19,5 @@ export default {
 </script>
 
 <style scoped>
-  @import "index.scss";
+@import 'index.scss';
 </style>
